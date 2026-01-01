@@ -1,27 +1,12 @@
 use reqwest::{blocking::Client, StatusCode};
 use rocket::serde::json::{serde_json::json, Value};
-
-fn create_test_rustacean(client: &Client) -> Value {
-    let request = json!({
-        "name": "Ashwin New",
-        "email": "ashwin@test.com"
-    });
-    let response = client
-        .post("http://127.0.0.1:8000/rustaceans")
-        .json(&request)
-        .send()
-        .unwrap();
-
-    assert_eq!(response.status(), StatusCode::CREATED);
-
-    response.json().unwrap()
-}
+mod common;
 
 #[test]
 fn test_get_rustaceans() {
     let client = Client::new();
-    let rustacean1: Value = create_test_rustacean(&client);
-    let rustacean2: Value = create_test_rustacean(&client);
+    let rustacean1: Value = common::create_test_rustacean(&client);
+    let rustacean2: Value = common::create_test_rustacean(&client);
 
     let response = client
         .get("http://127.0.0.1:8000/rustaceans")
@@ -33,6 +18,10 @@ fn test_get_rustaceans() {
 
     assert!(json.as_array().unwrap().contains(&rustacean1));
     assert!(json.as_array().unwrap().contains(&rustacean2));
+
+    // Cleanup
+    common::delete_test_rustacean(&client, &rustacean1);
+    common::delete_test_rustacean(&client, &rustacean2);
 }
 
 #[test]
@@ -60,12 +49,15 @@ fn test_create_rustaceans() {
             "created_at": rustacean["created_at"]
         })
     );
+
+    // Cleanup
+    common::delete_test_rustacean(&client, &rustacean);
 }
 
 #[test]
 fn test_view_rustaceans() {
     let client = Client::new();
-    let rustacean: Value = create_test_rustacean(&client);
+    let rustacean: Value = common::create_test_rustacean(&client);
 
     let view_response = client
         .get(format!(
@@ -85,12 +77,15 @@ fn test_view_rustaceans() {
             "created_at": view_rustacean["created_at"]
         })
     );
+    
+    // Cleanup
+    common::delete_test_rustacean(&client, &rustacean);
 }
 
 #[test]
 fn test_update_rustaceans() {
     let client = Client::new();
-    let rustacean: Value = create_test_rustacean(&client);
+    let rustacean: Value = common::create_test_rustacean(&client);
 
     let updated_response = client
         .put(format!(
@@ -114,12 +109,15 @@ fn test_update_rustaceans() {
             "created_at": updated_rustacean["created_at"]
         })
     );
+
+    // Cleanup
+    common::delete_test_rustacean(&client, &rustacean);
 }
 
 #[test]
 fn test_delete_rustaceans() {
     let client = Client::new();
-    let rustacean: Value = create_test_rustacean(&client);
+    let rustacean: Value = common::create_test_rustacean(&client);
 
     let delete_response = client
         .delete(format!(
