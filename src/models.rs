@@ -20,18 +20,20 @@ pub struct NewRustacean {
     email: String
 }
 
-#[derive(Queryable)]
+#[derive(Queryable, serde::Serialize, serde::Deserialize)]
 pub struct Crate {
+    #[serde(skip_deserializing)]
     pub id: i32,
     pub rustacean_id: i32,
     pub code: String,
     pub name: String,
     pub version: String,
     pub description: Option<String>,
+    #[serde(skip_deserializing)]
     pub created_at: NaiveDateTime
 }
 
-#[derive(Insertable)]
+#[derive(Insertable, serde::Deserialize)]
 #[diesel(table_name=crates)]
 pub struct NewCrate{
     pub rustacean_id: i32,

@@ -12,7 +12,7 @@ use rocket::serde::json::Value;
 
 #[rocket::get("/rustaceans")]
 pub async fn get_rustaceans(mut db: Connection<DbConn>) -> Result<Value, Custom<Value>> {
-    RustaceanRepository::findMultiple(&mut db, 100).await
+    RustaceanRepository::find_multiple(&mut db, 100).await
     .map(|rustaceans | json!(rustaceans))
     .map_err(|_| Custom(Status::InternalServerError, json!("Error.")))
 }
