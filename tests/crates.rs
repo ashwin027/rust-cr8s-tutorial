@@ -1,10 +1,10 @@
 use reqwest::{blocking::Client, StatusCode};
-use rocket::serde::json::{serde_json::json, Value};
+use serde_json::{json, Value};
 mod common;
 
 fn delete_test_crate(client: &Client, a_crate: &Value) {
     let delete_response = client
-        .delete(format!("http://127.0.0.1:8000/crates/{}", a_crate["id"]))
+        .delete(format!("{}/crates/{}", common::APP_HOST, a_crate["id"]))
         .send()
         .unwrap();
     assert_eq!(delete_response.status(), StatusCode::NO_CONTENT);
@@ -19,7 +19,7 @@ fn create_test_crate(client: &Client, rustacean: &Value) -> Value {
         "description": "test description"
     });
     let response = client
-        .post("http://127.0.0.1:8000/crates")
+        .post(format!("{}/crates", common::APP_HOST))
         .json(&request)
         .send()
         .unwrap();
@@ -36,7 +36,7 @@ fn test_get_crates() {
     let crate1: Value = create_test_crate(&client, &rustacean);
     let crate2: Value = create_test_crate(&client, &rustacean);
 
-    let response = client.get("http://127.0.0.1:8000/crates").send().unwrap();
+    let response = client.get(format!("{}/crates", common::APP_HOST)).send().unwrap();
 
     assert_eq!(response.status(), StatusCode::OK);
     let json: Value = response.json().unwrap();
@@ -62,7 +62,7 @@ fn test_create_crates() {
         "description": "test description"
     });
     let response = client
-        .post("http://127.0.0.1:8000/crates")
+        .post(format!("{}/crates", common::APP_HOST))
         .json(&request)
         .send()
         .unwrap();
@@ -96,7 +96,8 @@ fn test_view_crates() {
 
     let view_response = client
         .get(format!(
-            "http://127.0.0.1:8000/crates/{}",
+            "{}/crates/{}",
+            common::APP_HOST,
             a_crate["id"]
         ))
         .send()
@@ -129,7 +130,8 @@ fn test_update_crates() {
 
     let updated_response = client
         .put(format!(
-            "http://127.0.0.1:8000/crates/{}",
+            "{}/crates/{}",
+            common::APP_HOST,
             a_crate["id"]
         ))
         .json(&json!({
@@ -169,7 +171,8 @@ fn test_delete_crates() {
 
     let delete_response = client
         .delete(format!(
-            "http://127.0.0.1:8000/crates/{}",
+            "{}/crates/{}",
+            common::APP_HOST,
             a_crate["id"]
         ))
         .send()

@@ -1,5 +1,5 @@
 use reqwest::{blocking::Client, StatusCode};
-use rocket::serde::json::{serde_json::json, Value};
+use serde_json::{json, Value};
 mod common;
 
 #[test]
@@ -9,7 +9,7 @@ fn test_get_rustaceans() {
     let rustacean2: Value = common::create_test_rustacean(&client);
 
     let response = client
-        .get("http://127.0.0.1:8000/rustaceans")
+        .get(format!("{}/rustaceans", common::APP_HOST))
         .send()
         .unwrap();
 
@@ -32,7 +32,7 @@ fn test_create_rustaceans() {
         "email": "ashwin@test.com"
     });
     let response = client
-        .post("http://127.0.0.1:8000/rustaceans")
+        .post(format!("{}/rustaceans", common::APP_HOST))
         .json(&request)
         .send()
         .unwrap();
@@ -61,7 +61,8 @@ fn test_view_rustaceans() {
 
     let view_response = client
         .get(format!(
-            "http://127.0.0.1:8000/rustaceans/{}",
+            "{}/rustaceans/{}",
+            common::APP_HOST,
             rustacean["id"]
         ))
         .send()
@@ -89,7 +90,8 @@ fn test_update_rustaceans() {
 
     let updated_response = client
         .put(format!(
-            "http://127.0.0.1:8000/rustaceans/{}",
+            "{}/rustaceans/{}",
+            common::APP_HOST,
             rustacean["id"]
         ))
         .json(&json!({
@@ -121,7 +123,8 @@ fn test_delete_rustaceans() {
 
     let delete_response = client
         .delete(format!(
-            "http://127.0.0.1:8000/rustaceans/{}",
+            "{}/rustaceans/{}",
+            common::APP_HOST,
             rustacean["id"]
         ))
         .send()

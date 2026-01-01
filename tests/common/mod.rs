@@ -1,6 +1,7 @@
 use reqwest::{blocking::Client, StatusCode};
-use rocket::serde::json::{serde_json::json, Value};
+use serde_json::{json, Value};
 
+pub static APP_HOST: &'static str = "http://127.0.0.1:8000";
 pub fn delete_test_rustacean(client: &Client, rustacean: &Value){
     let delete_response = client
         .delete(format!(
