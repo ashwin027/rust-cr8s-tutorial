@@ -3,10 +3,10 @@ use rocket::response::status::Custom;
 use rocket::response::status::NoContent;
 use rocket::serde::json::Json;
 use rocket_db_pools::{Connection};
-use crate::DbConn;
 use crate::models::NewRustacean;
 use crate::models::Rustacean;
 use crate::repositories::RustaceanRepository;
+use crate::rocket_routes::DbConn;
 use rocket::serde::json::json;
 use rocket::serde::json::Value;
 
