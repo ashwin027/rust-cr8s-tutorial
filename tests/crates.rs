@@ -175,4 +175,5 @@ fn test_delete_crates() {
         .send()
         .unwrap();
     assert_eq!(delete_response.status(), StatusCode::NO_CONTENT);
+    common::delete_test_rustacean(&client, &rustacean);
 }
