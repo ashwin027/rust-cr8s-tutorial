@@ -27,7 +27,7 @@ fn test_get_rustaceans() {
 #[test]
 fn test_create_rustaceans() {
     let client = Client::new();
-        let request = json!({
+    let request = json!({
         "name": "Ashwin New",
         "email": "ashwin@test.com"
     });
@@ -38,7 +38,7 @@ fn test_create_rustaceans() {
         .unwrap();
 
     assert_eq!(response.status(), StatusCode::CREATED);
-    
+
     let rustacean: Value = response.json().unwrap();
     assert_eq!(
         rustacean,
@@ -78,9 +78,22 @@ fn test_view_rustaceans() {
             "created_at": view_rustacean["created_at"]
         })
     );
-    
+
     // Cleanup
     common::delete_test_rustacean(&client, &rustacean);
+}
+
+#[test]
+fn test_view_rustacean_not_found() {
+    let client = Client::new();
+
+    let view_response = client
+        .get(format!("{}/rustaceans/{}", common::APP_HOST, 0))
+        .send()
+        .unwrap();
+    assert_eq!(view_response.status(), StatusCode::NOT_FOUND);
+    let view_crate: Value = view_response.json().unwrap();
+    assert_eq!(view_crate.as_str(), Some("Not found"));
 }
 
 #[test]
