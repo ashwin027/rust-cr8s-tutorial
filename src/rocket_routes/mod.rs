@@ -6,6 +6,7 @@ use rocket::serde::json::json;
 use rocket::serde::json::Value;
 pub mod crates;
 pub mod rustaceans;
+pub mod authorization;
 
 #[derive(Database)]
 #[database("postgres")]
