@@ -19,9 +19,6 @@ pub async fn login(
     let user_option = UserRepository::find_by_username(&mut db, &credentials.username)
         .await
         .map_err(|e| match e {
-            diesel::result::Error::NotFound => {
-                Custom(Status::Unauthorized, json!("Wrong credentials"))
-            }
             _ => server_error(e.into()),
         })?;
 
