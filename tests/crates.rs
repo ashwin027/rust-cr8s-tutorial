@@ -31,7 +31,7 @@ fn create_test_crate(client: &Client, rustacean: &Value) -> Value {
 
 #[test]
 fn test_get_crates() {
-    let client = Client::new();
+    let client = common::get_client_with_logged_in_admin();
     let rustacean: Value = common::create_test_rustacean(&client);
     let crate1: Value = create_test_crate(&client, &rustacean);
     let crate2: Value = create_test_crate(&client, &rustacean);
@@ -55,7 +55,7 @@ fn test_get_crates() {
 
 #[test]
 fn test_create_crates() {
-    let client = Client::new();
+    let client = common::get_client_with_logged_in_admin();
     let rustacean: Value = common::create_test_rustacean(&client);
     let request = json!({
         "name": "Ashwin New",
@@ -93,7 +93,7 @@ fn test_create_crates() {
 
 #[test]
 fn test_view_crates_not_found() {
-    let client = Client::new();
+    let client = common::get_client_with_logged_in_admin();
 
     let view_response = client
         .get(format!("{}/crates/{}", common::APP_HOST, 0))
@@ -106,7 +106,7 @@ fn test_view_crates_not_found() {
 
 #[test]
 fn test_view_crates() {
-    let client = Client::new();
+    let client = common::get_client_with_logged_in_admin();
     let rustacean: Value = common::create_test_rustacean(&client);
     let a_crate: Value = create_test_crate(&client, &rustacean);
 
@@ -136,7 +136,7 @@ fn test_view_crates() {
 
 #[test]
 fn test_update_crates() {
-    let client = Client::new();
+    let client = common::get_client_with_logged_in_admin();
     let rustacean: Value = common::create_test_rustacean(&client);
     let a_crate: Value = create_test_crate(&client, &rustacean);
     let rustacean2: Value = common::create_test_rustacean(&client);
@@ -178,7 +178,7 @@ fn test_update_crates() {
 
 #[test]
 fn test_delete_crates() {
-    let client = Client::new();
+    let client = common::get_client_with_logged_in_admin();
     let rustacean: Value = common::create_test_rustacean(&client);
     let a_crate: Value = create_test_crate(&client, &rustacean);
 

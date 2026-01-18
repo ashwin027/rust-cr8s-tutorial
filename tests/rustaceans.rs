@@ -7,7 +7,7 @@ mod common;
 
 #[test]
 fn test_get_rustaceans() {
-    let client = Client::new();
+    let client = common::get_client_with_logged_in_admin();
     let rustacean1: Value = create_test_rustacean(&client);
     let rustacean2: Value = create_test_rustacean(&client);
 
@@ -29,7 +29,7 @@ fn test_get_rustaceans() {
 
 #[test]
 fn test_create_rustaceans() {
-    let client = Client::new();
+    let client = common::get_client_with_logged_in_admin();
     let request = json!({
         "name": "Ashwin New",
         "email": "ashwin@test.com"
@@ -59,7 +59,7 @@ fn test_create_rustaceans() {
 
 #[test]
 fn test_view_rustaceans() {
-    let client = Client::new();
+    let client = common::get_client_with_logged_in_admin();
     let rustacean: Value = create_test_rustacean(&client);
 
     let view_response = client
@@ -88,7 +88,7 @@ fn test_view_rustaceans() {
 
 #[test]
 fn test_view_rustacean_not_found() {
-    let client = Client::new();
+    let client = common::get_client_with_logged_in_admin();
 
     let view_response = client
         .get(format!("{}/rustaceans/{}", common::APP_HOST, 0))
@@ -101,7 +101,7 @@ fn test_view_rustacean_not_found() {
 
 #[test]
 fn test_update_rustaceans() {
-    let client = Client::new();
+    let client = common::get_client_with_logged_in_admin();
     let rustacean: Value = common::create_test_rustacean(&client);
 
     let updated_response = client
@@ -134,7 +134,7 @@ fn test_update_rustaceans() {
 
 #[test]
 fn test_delete_rustaceans() {
-    let client = Client::new();
+    let client = common::get_client_with_logged_in_admin();
     let rustacean: Value = common::create_test_rustacean(&client);
 
     let delete_response = client

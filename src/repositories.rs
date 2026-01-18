@@ -86,8 +86,17 @@ impl CrateRepository {
 pub struct UserRepository;
 
 impl UserRepository {
-    pub async fn find_by_username(c: &mut AsyncPgConnection, username: &String) -> QueryResult<Option<User>>{
-        users::table::filter(schema::users::table, users::username.eq(username)).get_result(c).await.optional()
+    pub async fn find(c: &mut AsyncPgConnection, id: i32) -> QueryResult<User> {
+        users::table.find(id).get_result(c).await
+    }
+    pub async fn find_by_username(
+        c: &mut AsyncPgConnection,
+        username: &String,
+    ) -> QueryResult<Option<User>> {
+        users::table::filter(schema::users::table, users::username.eq(username))
+            .get_result(c)
+            .await
+            .optional()
     }
 
     pub async fn find_with_roles(
@@ -145,9 +154,16 @@ impl UserRepository {
         Ok(user)
     }
 
-    pub async fn delete_user(c: &mut AsyncPgConnection, id: i32) -> QueryResult<usize>{
-        diesel::delete(users_roles::table::filter(schema::users_roles::table, users_roles::user_id.eq(id))).execute(c).await?;
-        diesel::delete(users::table::find(schema::users::table, id)).execute(c).await
+    pub async fn delete_user(c: &mut AsyncPgConnection, id: i32) -> QueryResult<usize> {
+        diesel::delete(users_roles::table::filter(
+            schema::users_roles::table,
+            users_roles::user_id.eq(id),
+        ))
+        .execute(c)
+        .await?;
+        diesel::delete(users::table::find(schema::users::table, id))
+            .execute(c)
+            .await
     }
 }
 

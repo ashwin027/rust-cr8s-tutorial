@@ -1,5 +1,4 @@
 use crate::auth::{authorize_user, Credentials};
-use crate::models::User;
 use crate::repositories::UserRepository;
 use crate::rocket_routes::{server_error, CacheConn, DbConn};
 use rocket::http::Status;
