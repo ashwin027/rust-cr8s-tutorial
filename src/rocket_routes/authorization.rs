@@ -1,4 +1,5 @@
 use crate::auth::{authorize_user, Credentials};
+use crate::models::User;
 use crate::repositories::UserRepository;
 use crate::rocket_routes::{server_error, CacheConn, DbConn};
 use rocket::http::Status;
@@ -15,22 +16,27 @@ pub async fn login(
     mut cache: Connection<CacheConn>,
     credentials: Json<Credentials>,
 ) -> Result<Value, Custom<Value>> {
-    let user = UserRepository::find_by_username(&mut db, &credentials.username)
+    let user_option = UserRepository::find_by_username(&mut db, &credentials.username)
         .await
-        .map_err(|e| {
-            match e {
-                diesel::result::Error::NotFound => Custom(Status::Unauthorized, json!("Wrong credentials")),
-                _ => server_error(e.into()),
+        .map_err(|e| match e {
+            diesel::result::Error::NotFound => {
+                Custom(Status::Unauthorized, json!("Wrong credentials"))
             }
+            _ => server_error(e.into()),
         })?;
 
-    let session_id = authorize_user(&user, credentials.into_inner())
-        .map_err(|_| Custom(Status::Unauthorized, json!("Wrong credentials")))?;
+    match user_option {
+        Some(user) => {
+            let session_id = authorize_user(&user, credentials.into_inner())
+                .map_err(|_| Custom(Status::Unauthorized, json!("Wrong credentials")))?;
 
-    let _ = cache
-        .set_ex::<String, i32, ()>(format!("sessions/{}", session_id), user.id, 3 * 60 * 60)
-        .await
-        .map_err(|e| server_error(e.into()));
+            let _ = cache
+                .set_ex::<String, i32, ()>(format!("sessions/{}", session_id), user.id, 3 * 60 * 60)
+                .await
+                .map_err(|e| server_error(e.into()));
 
-    Ok(json!({"token": session_id}))
+            Ok(json!({"token": session_id}))
+        }
+        None => {Err(Custom(Status::Unauthorized, json!("Wrong credentials")))}
+    }
 }

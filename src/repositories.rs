@@ -1,6 +1,6 @@
 use crate::schema::*;
 use crate::{models::*, schema};
-use diesel::{BelongingToDsl, GroupedBy};
+use diesel::{BelongingToDsl, GroupedBy, OptionalExtension};
 use diesel::{ExpressionMethods, QueryDsl, QueryResult};
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
 
@@ -86,8 +86,8 @@ impl CrateRepository {
 pub struct UserRepository;
 
 impl UserRepository {
-    pub async fn find_by_username(c: &mut AsyncPgConnection, username: &String) -> QueryResult<User>{
-        users::table::filter(schema::users::table, users::username.eq(username)).get_result(c).await
+    pub async fn find_by_username(c: &mut AsyncPgConnection, username: &String) -> QueryResult<Option<User>>{
+        users::table::filter(schema::users::table, users::username.eq(username)).get_result(c).await.optional()
     }
 
     pub async fn find_with_roles(
