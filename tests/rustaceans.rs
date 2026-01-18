@@ -1,12 +1,15 @@
 use reqwest::{blocking::Client, StatusCode};
 use serde_json::{json, Value};
+
+use crate::common::delete_test_rustacean;
+use crate::common::create_test_rustacean;
 mod common;
 
 #[test]
 fn test_get_rustaceans() {
     let client = Client::new();
-    let rustacean1: Value = common::create_test_rustacean(&client);
-    let rustacean2: Value = common::create_test_rustacean(&client);
+    let rustacean1: Value = create_test_rustacean(&client);
+    let rustacean2: Value = create_test_rustacean(&client);
 
     let response = client
         .get(format!("{}/rustaceans", common::APP_HOST))
@@ -20,8 +23,8 @@ fn test_get_rustaceans() {
     assert!(json.as_array().unwrap().contains(&rustacean2));
 
     // Cleanup
-    common::delete_test_rustacean(&client, &rustacean1);
-    common::delete_test_rustacean(&client, &rustacean2);
+    delete_test_rustacean(&client, &rustacean1);
+    delete_test_rustacean(&client, &rustacean2);
 }
 
 #[test]
@@ -51,13 +54,13 @@ fn test_create_rustaceans() {
     );
 
     // Cleanup
-    common::delete_test_rustacean(&client, &rustacean);
+    delete_test_rustacean(&client, &rustacean);
 }
 
 #[test]
 fn test_view_rustaceans() {
     let client = Client::new();
-    let rustacean: Value = common::create_test_rustacean(&client);
+    let rustacean: Value = create_test_rustacean(&client);
 
     let view_response = client
         .get(format!(
@@ -80,7 +83,7 @@ fn test_view_rustaceans() {
     );
 
     // Cleanup
-    common::delete_test_rustacean(&client, &rustacean);
+    delete_test_rustacean(&client, &rustacean);
 }
 
 #[test]
@@ -126,7 +129,7 @@ fn test_update_rustaceans() {
     );
 
     // Cleanup
-    common::delete_test_rustacean(&client, &rustacean);
+    delete_test_rustacean(&client, &rustacean);
 }
 
 #[test]

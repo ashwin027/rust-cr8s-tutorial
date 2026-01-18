@@ -1,21 +1,31 @@
+use crate::auth::{authorize_user, Credentials};
+use crate::repositories::UserRepository;
+use crate::rocket_routes::{server_error, CacheConn, DbConn};
+use rocket::http::Status;
 use rocket::response::status::Custom;
-use rocket::serde::json::Json;
-use rocket_db_pools::Connection;
-use crate::auth::{self, Credentials};
-use crate::rocket_routes::server_error;
-use crate::{repositories::UserRepository, rocket_routes::DbConn};
-use rocket::serde::json::Value;
 use rocket::serde::json::json;
+use rocket::serde::json::Json;
+use rocket::serde::json::Value;
+use rocket_db_pools::deadpool_redis::redis::AsyncCommands;
+use rocket_db_pools::Connection;
 
-#[rocket::post("/login", format = "json", data= "<credentials>")]
-pub async fn login(mut db: Connection<DbConn>, credentials: Json<Credentials>,) -> Result<Value, Custom<Value>> {
-    UserRepository::find_by_username(&mut db, &credentials.username)
+#[rocket::post("/login", format = "json", data = "<credentials>")]
+pub async fn login(
+    mut db: Connection<DbConn>,
+    mut cache: Connection<CacheConn>,
+    credentials: Json<Credentials>,
+) -> Result<Value, Custom<Value>> {
+    let user = UserRepository::find_by_username(&mut db, &credentials.username)
         .await
-        .map(|user| {
-            if let Ok(token) = auth::authorize_user(&user, credentials.into_inner()) {
-                return json!(token);
-            }
-            json!("Unauthorized")
-        })
-        .map_err(|e| server_error(e.into()))
+        .map_err(|e| server_error(e.into()))?;
+
+    let session_id = authorize_user(&user, credentials.into_inner())
+        .map_err(|_| Custom(Status::Unauthorized, json!("Wrong credentials")))?;
+
+    let _ = cache
+        .set_ex::<String, i32, ()>(format!("sessions/{}", session_id), user.id, 3 * 60 * 60)
+        .await
+        .map_err(|e| server_error(e.into()));
+
+    Ok(json!({"token": session_id}))
 }

@@ -14,8 +14,9 @@ async fn main() {
         cr8s::rocket_routes::crates::create_crate,
         cr8s::rocket_routes::crates::delete_crate,
         cr8s::rocket_routes::crates::update_crate,
-        cr8s::rocket_routes::authorization::login,
+        cr8s::rocket_routes::authorization::login
     ])
+    .attach(cr8s::rocket_routes::CacheConn::init())
     .attach(cr8s::rocket_routes::DbConn::init())
     .launch()
     .await;
